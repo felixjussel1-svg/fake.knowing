@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake PowerShell - Phishing-Schutz-Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1e1e1e;
+            font-family: 'Consolas', 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .powershell-window {
+            width: 100%;
+            max-width: 900px;
+            background: #0c0c0c;
+            border-radius: 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 95vh;
+            border: 1px solid #333;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(90deg, #0078d7 0%, #005a9e 100%);
+            color: white;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .title-text {
+            flex: 1;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn.close:hover {
+            background: #e81123;
+        }
+
+        /* Menu Bar */
+        .menu-bar {
+            background: #0c0c0c;
+            color: #cccccc;
+            padding: 2px 4px;
+            font-size: 11px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            gap: 12px;
+        }
+
+        .menu-item {
+            padding: 2px 4px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #333;
+        }
+
+        /* Terminal Content */
+        .terminal-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #0c0c0c;
+            padding: 12px;
+            color: #00ff00;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-content::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .terminal-content::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        .terminal-content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 6px;
+        }
+
+        .terminal-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .prompt {
+            color: #00ff00;
+        }
+
+        .warning-text {
+            color: #ff6b6b;
+        }
+
+        .success-text {
+            color: #51cf66;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0;
+            align-items: center;
+        }
+
+        .input-label {
+            color: #00ff00;
+            min-width: 180px;
+            flex-shrink: 0;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            background: #0c0c0c;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 4px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            flex: 1;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus {
+            border: 1px solid #ffff00;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+
+        button {
+            background: #0078d7;
+            color: white;
+            border: 1px solid #00ff00;
+            padding: 6px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            background: #005a9e;
+        }
+
+        /* Warning Screen */
+        .warning-screen {
+            display: none;
+        }
+
+        .warning-screen.active {
+            display: block;
+        }
+
+        .warning-screen h1 {
+            font-size: 14px;
+            margin: 8px 0;
+            color: #ffff00;
+        }
+
+        .warning-screen h2 {
+            font-size: 13px;
+            margin: 12px 0 6px 0;
+            color: #ff6b6b;
+        }
+
+        .warning-screen p {
+            margin: 4px 0;
+            line-height: 1.4;
+            font-size: 12px;
+        }
+
+        .data-box {
+            background: #1e1e1e;
+            border: 1px solid #ff6b6b;
+            padding: 6px;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+
+        .data-item {
+            margin: 2px 0;
+        }
+
+        .tips-box {
+            background: #1e1e1e;
+            border: 1px solid #51cf66;
+            padding: 6px;
+            margin: 8px 0;
+        }
+
+        .tips-box h3 {
+            color: #51cf66;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .tips-box ul {
+            list-style: none;
+            padding-left: 8px;
+            font-size: 12px;
+        }
+
+        .tips-box li {
+            margin: 2px 0;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .tips-box li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #51cf66;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        button.btn-again,
+        button.btn-learn {
+            flex: 1;
+        }
+
+        @media (max-width: 600px) {
+            .terminal-content {
+                font-size: 11px;
+            }
+
+            .input-label {
+                min-width: 140px;
+            }
+
+            button {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="powershell-window">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <span class="title-text">Administrator: Windows PowerShell</span>
+            <div class="window-controls">
+                <button class="control-btn">_</button>
+                <button class="control-btn">⬚</button>
+                <button class="control-btn close">×</button>
+            </div>
+        </div>
+
+        <!-- Menu Bar -->
+        <div class="menu-bar">
+            <span class="menu-item">File</span>
+            <span class="menu-item">Edit</span>
+            <span class="menu-item">View</span>
+        </div>
+
+        <!-- Terminal Content -->
+        <div class="terminal-content" id="terminalOutput">
+<span class="prompt">Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\Users\Admin> </span><span style="color: #00ff00;">Loading SYSTEM_SECURITY_CHECK_v2.3...
+[████████████████████] 100%
+
+</span>
+<span class="form-container active" id="formContainer">
+<span style="color: #ffff00;">======================================
+SYSTEM SECURITY UPDATE REQUIRED
+======================================
+
+Please provide your credentials to complete the security update.
+This process will take approximately 2 minutes.
+
+</span>
+<form id="phishingForm" style="color: #00ff00;">
+<div class="form-group">
+<label class="input-label">Full Name:</label>
+<input type="text" id="name" name="name" required>
+</div>
+
+<div class="form-group">
+<label class="input-label">Email Address:</label>
+<input type="email" id="email" name="email" required>
+</div>
+
+<div class="form-group">
+<label class="input-label">Bank Account:</label>
+<input type="text" id="account" name="account" placeholder="IBAN or Account Number" required>
+</div>
+
+<div class="form-group">
+<label class="input-label">PIN/Password:</label>
+<input type="password" id="password" name="password" required>
+</div>
+
+<div class="form-group">
+<label class="input-label">ID Number (SSN):</label>
+<input type="text" id="ssn" name="ssn" required>
+</div>
+
+<div class="form-group">
+<label class="input-label">Phone Number:</label>
+<input type="text" id="phone" name="phone" placeholder="+49 123 456789" required>
+</div>
+
+<button type="submit">Execute Update</button>
+</form>
+</span>
+
+<div class="warning-screen" id="warningScreen">
+<span class="warning-text">⚠️  ⚠️  ⚠️  WARNING: PHISHING SCAM DETECTED!  ⚠️  ⚠️  ⚠️</span>
+<h1>🚨 YOU WERE JUST TRAINED TO RECOGNIZE A PHISHING ATTACK!</h1>
+
+<p>This PowerShell window was FAKE - it was designed to teach you how scammers
+trick people into revealing sensitive information.</p>
+
+<h2>📋 Data You Entered:</h2>
+<div class="data-box" id="displayedData"></div>
+
+<h2>🚩 RED FLAGS YOU SHOULD HAVE NOTICED:</h2>
+<p>• Unsolicited security prompts asking for sensitive data
+• Requests for bank account numbers, PIN, or passwords  
+• Suspicious origin - where did this window come from?
+• Sense of urgency ("System update required immediately")
+• Asking for ID/SSN - legitimate systems rarely need this
+• PowerShell window appearing randomly on your desktop
+• Unknown .ps1 or .bat files being executed</p>
+
+<h2>⚠️ REAL ATTACKS OFTEN USE:</h2>
+<p>• Fake Windows Update notifications
+• Email attachments that run PowerShell scripts
+• Command Prompt windows that pop up unexpectedly
+• Downloaded scripts from suspicious sources
+• Social engineering (pretending to be support staff)
+• Requests to run commands you don't understand</p>
+
+<div class="tips-box">
+<h3>✓ HOW TO PROTECT YOURSELF:</h3>
+<ul>
+<li>Never enter sensitive data into unsolicited popups</li>
+<li>Verify requests by calling official support directly</li>
+<li>Check the script source before running PowerShell scripts</li>
+<li>Keep Windows and security software updated</li>
+<li>Use strong, unique passwords for important accounts</li>
+<li>Enable two-factor authentication where possible</li>
+<li>Be suspicious of unsolicited security warnings</li>
+<li>Report suspicious scripts to your IT department</li>
+</ul>
+</div>
+
+<h2>📚 LEARN MORE:</h2>
+<p>• Microsoft Security: security.microsoft.com
+• BSI (Germany): bsi.bund.de  
+• Verbraucherzentrale: verbraucherzentrale.de</p>
+
+<div class="button-group">
+<button class="btn-again" onclick="resetForm()">Try Again</button>
+<button class="btn-learn" onclick="openResources()">Learn More</button>
+</div>
+</div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('phishingForm');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const formContainer = document.getElementById('formContainer');
+        const warningScreen = document.getElementById('warningScreen');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                account: document.getElementById('account').value,
+                password: document.getElementById('password').value,
+                ssn: document.getElementById('ssn').value,
+                phone: document.getElementById('phone').value
+            };
+
+            displayUserData(formData);
+
+            // Hide form, show warning
+            formContainer.classList.remove('active');
+            warningScreen.classList.add('active');
+
+            // Scroll to top
+            terminalOutput.scrollTop = 0;
+        });
+
+        function displayUserData(data) {
+            const displayDiv = document.getElementById('displayedData');
+            const items = [
+                `Name: ${escapeHtml(data.name)}`,
+                `Email: ${escapeHtml(data.email)}`,
+                `Account: ${escapeHtml(data.account)}`,
+                `PIN: ${'•'.repeat(data.password.length)}`,
+                `ID Number: ${escapeHtml(data.ssn)}`,
+                `Phone: ${escapeHtml(data.phone)}`
+            ];
+            displayDiv.innerHTML = items.map(item => `<div class="data-item">${item}</div>`).join('');
+        }
+
+        function resetForm() {
+            form.reset();
+            formContainer.classList.add('active');
+            warningScreen.classList.remove('active');
+            terminalOutput.scrollTop = 0;
+        }
+
+        function openResources() {
+            alert('Security Resources:\n\n' +
+                '1. Microsoft Security:\n   security.microsoft.com\n\n' +
+                '2. BSI (Germany):\n   bsi.bund.de\n\n' +
+                '3. Report Phishing:\n   Contact your bank or local police');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
