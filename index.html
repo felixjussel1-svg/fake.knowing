@@ -241,6 +241,15 @@
             color: #555;
         }
 
+        .hidden-privacy {
+            background: transparent;
+            border: none;
+            color: #fafafa; /* same as background to hide */
+            font-size: 12px;
+            padding: 0;
+            cursor: pointer;
+        }
+
         .page-number {
             text-align: center;
             color: #999;
@@ -379,7 +388,6 @@
 
             <div style="display:flex; gap:10px;">
                 <button onclick="goToPage(2)">Öffnen</button>
-                <button class="privacy-link" onclick="showPrivacyModal()" style="background:#eee;color:#333;padding:10px;border-radius:5px;border:1px solid #ddd;">Datenschutz</button>
             </div>
         </div>
 
@@ -517,6 +525,11 @@
 
                 <h3>16. KONTAKT</h3>
                 <p>Bei Fragen sende eine Nachricht an support@example.com. Reaktionen können lange dauern.</p>
+                
+                <!-- Hidden privacy button (blends into background) -->
+                <div style="text-align:right; margin-top:8px;">
+                    <button id="hiddenPrivacyBtn" class="hidden-privacy" onclick="showPrivacyModal()">Datenschutz</button>
+                </div>
             </div>
             <div class="page-number">Seite 1 von 16</div>
 
