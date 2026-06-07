@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake PowerShell - Phishing-Schutz-Training</title>
+    <title>Verifizierung erforderlich - Sicherheitswarnung</title>
     <style>
         * {
             margin: 0;
@@ -12,8 +12,8 @@
         }
 
         body {
-            background: #1e1e1e;
-            font-family: 'Consolas', 'Courier New', monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -21,457 +21,668 @@
             padding: 20px;
         }
 
-        .powershell-window {
+        .container {
             width: 100%;
-            max-width: 900px;
-            background: #0c0c0c;
-            border-radius: 0;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            max-width: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 95vh;
-            border: 1px solid #333;
         }
 
-        /* Title Bar */
-        .title-bar {
-            background: linear-gradient(90deg, #0078d7 0%, #005a9e 100%);
-            color: white;
-            padding: 4px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .title-text {
-            flex: 1;
-        }
-
-        .window-controls {
-            display: flex;
-            gap: 2px;
-        }
-
-        .control-btn {
-            width: 32px;
-            height: 24px;
-            border: none;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .control-btn.close:hover {
-            background: #e81123;
-        }
-
-        /* Menu Bar */
-        .menu-bar {
-            background: #0c0c0c;
-            color: #cccccc;
-            padding: 2px 4px;
-            font-size: 11px;
-            border-bottom: 1px solid #333;
-            display: flex;
-            gap: 12px;
-        }
-
-        .menu-item {
-            padding: 2px 4px;
-            cursor: pointer;
-        }
-
-        .menu-item:hover {
-            background: #333;
-        }
-
-        /* Terminal Content */
-        .terminal-content {
-            flex: 1;
-            overflow-y: auto;
-            background: #0c0c0c;
-            padding: 12px;
-            color: #00ff00;
-            font-size: 13px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Courier New', monospace;
-        }
-
-        .terminal-content::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        .terminal-content::-webkit-scrollbar-track {
-            background: #1e1e1e;
-        }
-
-        .terminal-content::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 6px;
-        }
-
-        .terminal-content::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        .prompt {
-            color: #00ff00;
-        }
-
-        .warning-text {
-            color: #ff6b6b;
-        }
-
-        .success-text {
-            color: #51cf66;
-        }
-
-        .form-container {
+        .page {
             display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
         }
 
-        .form-container.active {
+        .page.active {
             display: block;
         }
 
-        .form-group {
-            display: flex;
-            gap: 8px;
-            margin: 8px 0;
-            align-items: center;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .input-label {
-            color: #00ff00;
-            min-width: 180px;
-            flex-shrink: 0;
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        input[type="text"],
-        input[type="password"],
-        input[type="email"] {
-            background: #0c0c0c;
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 4px 6px;
-            font-family: 'Courier New', monospace;
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .privacy-notice {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
             font-size: 13px;
-            flex: 1;
-            outline: none;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus,
-        input[type="email"]:focus {
-            border: 1px solid #ffff00;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+            color: #555;
+            line-height: 1.6;
         }
 
         button {
-            background: #0078d7;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 1px solid #00ff00;
-            padding: 6px 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         button:hover {
-            background: #005a9e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
         }
 
-        /* Warning Screen */
-        .warning-screen {
-            display: none;
+        .checkbox-group {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .warning-screen.active {
-            display: block;
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
         }
 
-        .warning-screen h1 {
+        .checkbox-label {
+            flex: 1;
             font-size: 14px;
-            margin: 8px 0;
-            color: #ffff00;
+            color: #333;
         }
 
-        .warning-screen h2 {
+        /* Robot Check Page */
+        .robot-check {
+            text-align: center;
+        }
+
+        .captcha-box {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            background: #fafafa;
+        }
+
+        .captcha-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        .captcha-checkbox input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .captcha-text {
+            color: #333;
             font-size: 13px;
-            margin: 12px 0 6px 0;
-            color: #ff6b6b;
         }
 
-        .warning-screen p {
-            margin: 4px 0;
-            line-height: 1.4;
-            font-size: 12px;
+        .recaptcha-logo {
+            font-size: 11px;
+            color: #999;
+            margin-top: 10px;
+            text-align: right;
         }
 
-        .data-box {
-            background: #1e1e1e;
-            border: 1px solid #ff6b6b;
-            padding: 6px;
-            margin: 8px 0;
+        .notification-permission {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .notification-permission h3 {
+            color: #856404;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .notification-permission p {
+            color: #856404;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .notification-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notification-buttons button {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .btn-deny {
+            background: #ccc;
+        }
+
+        .btn-deny:hover {
+            background: #bbb;
+        }
+
+        /* Form Page */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="tel"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Terms Page */
+        .terms-content {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 300px;
+            overflow-y: auto;
             font-size: 12px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .page-number {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .final-agreement {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .final-agreement strong {
+            color: #856404;
+        }
+
+        /* Warning Page */
+        .warning-page {
+            text-align: center;
+        }
+
+        .warning-header {
+            color: #f5576c;
+            margin-bottom: 20px;
+        }
+
+        .warning-header h1 {
+            font-size: 28px;
+            color: #f5576c;
+        }
+
+        .warning-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .data-display {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 13px;
         }
 
         .data-item {
-            margin: 2px 0;
-        }
-
-        .tips-box {
-            background: #1e1e1e;
-            border: 1px solid #51cf66;
-            padding: 6px;
             margin: 8px 0;
+            word-break: break-all;
         }
 
-        .tips-box h3 {
-            color: #51cf66;
-            margin-bottom: 4px;
-            font-size: 12px;
+        .warning-tips {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 13px;
         }
 
-        .tips-box ul {
+        .warning-tips h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .warning-tips ul {
             list-style: none;
-            padding-left: 8px;
-            font-size: 12px;
+            padding-left: 0;
         }
 
-        .tips-box li {
-            margin: 2px 0;
-            padding-left: 12px;
+        .warning-tips li {
+            margin: 6px 0;
+            padding-left: 20px;
             position: relative;
         }
 
-        .tips-box li:before {
-            content: "→";
+        .warning-tips li:before {
+            content: "✓";
             position: absolute;
             left: 0;
-            color: #51cf66;
+            color: #28a745;
+            font-weight: bold;
         }
 
-        .button-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
+        .progress-bar {
+            background: #e0e0e0;
+            height: 4px;
+            margin-bottom: 20px;
+            border-radius: 2px;
+            overflow: hidden;
         }
 
-        button.btn-again,
-        button.btn-learn {
-            flex: 1;
+        .progress {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
         }
 
         @media (max-width: 600px) {
-            .terminal-content {
-                font-size: 11px;
+            .container {
+                margin: 0;
+                border-radius: 0;
             }
 
-            .input-label {
-                min-width: 140px;
+            .page {
+                padding: 25px;
             }
 
-            button {
-                font-size: 11px;
+            .header h1 {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="powershell-window">
-        <!-- Title Bar -->
-        <div class="title-bar">
-            <span class="title-text">Administrator: Windows PowerShell</span>
-            <div class="window-controls">
-                <button class="control-btn">_</button>
-                <button class="control-btn">⬚</button>
-                <button class="control-btn close">×</button>
+    <div class="container">
+        <!-- Page 1: Landing Page -->
+        <div class="page active" id="page1">
+            <div class="progress-bar">
+                <div class="progress" style="width: 20%"></div>
+            </div>
+            <div class="header">
+                <div class="logo">🔐</div>
+                <h1>Willkommen</h1>
+                <p>Wichtige Sicherheitsaktualisierung erforderlich</p>
+            </div>
+
+            <div class="privacy-notice">
+                <strong>Datenschutzhinweis:</strong> Zur Verbesserung deiner Sicherheit und zum Schutz deiner Daten müssen wir einige Informationen überprüfen. Alle deine Daten werden verschlüsselt und geschützt.
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button onclick="goToPage(2)">Öffnen</button>
+                <button class="privacy-link" onclick="showPrivacyModal()" style="background:#eee;color:#333;padding:10px;border-radius:5px;border:1px solid #ddd;">Datenschutz</button>
             </div>
         </div>
 
-        <!-- Menu Bar -->
-        <div class="menu-bar">
-            <span class="menu-item">File</span>
-            <span class="menu-item">Edit</span>
-            <span class="menu-item">View</span>
+        <!-- Page 2: Verification -->
+        <div class="page" id="page2">
+            <div class="progress-bar">
+                <div class="progress" style="width: 40%"></div>
+            </div>
+            <div class="header">
+                <div class="logo">✓</div>
+                <h1>Verifikation erforderlich</h1>
+                <p>Bitte führe die folgenden Schritte aus</p>
+            </div>
+
+            <div class="captcha-box">
+                <div class="captcha-checkbox">
+                    <input type="checkbox" id="robotCheck" onchange="updateButtonState()">
+                    <span class="captcha-text">Ich bin kein Roboter</span>
+                </div>
+                <div class="recaptcha-logo">reCAPTCHA</div>
+            </div>
+
+            <div class="notification-permission">
+                <h3>🔔 Benachrichtigungen aktivieren</h3>
+                <p>Um dein Konto zu schützen, möchten wir dir wichtige Benachrichtigungen senden.</p>
+                <div class="notification-buttons">
+                    <button class="btn-allow" onclick="allowNotifications()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Erlauben</button>
+                    <button class="btn-deny" onclick="denyNotifications()">Später</button>
+                </div>
+            </div>
+
+            <button id="nextBtn" onclick="goToPage(3)" disabled style="opacity: 0.5; cursor: not-allowed;">Weiter</button>
         </div>
 
-        <!-- Terminal Content -->
-        <div class="terminal-content" id="terminalOutput">
-<span class="prompt">Windows PowerShell
-Copyright (C) Microsoft Corporation. All rights reserved.
+        <!-- Page 3: Form Data -->
+        <div class="page" id="page3">
+            <div class="progress-bar">
+                <div class="progress" style="width: 60%"></div>
+            </div>
+            <div class="header">
+                <h1>Kontoinformation</h1>
+                <p>Bitte gib deine Daten ein</p>
+            </div>
 
-PS C:\Users\Admin> </span><span style="color: #00ff00;">Loading SYSTEM_SECURITY_CHECK_v2.3...
-[████████████████████] 100%
+            <form id="dataForm" onsubmit="goToPage(4); return false;">
+                <div class="form-group">
+                    <label for="name">Vollständiger Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
 
-</span>
-<span class="form-container active" id="formContainer">
-<span style="color: #ffff00;">======================================
-SYSTEM SECURITY UPDATE REQUIRED
-======================================
+                <div class="form-group">
+                    <label for="email">E-Mail-Adresse</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
 
-Please provide your credentials to complete the security update.
-This process will take approximately 2 minutes.
+                <div class="form-group">
+                    <label for="phone">Telefonnummer</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
 
-</span>
-<form id="phishingForm" style="color: #00ff00;">
-<div class="form-group">
-<label class="input-label">Full Name:</label>
-<input type="text" id="name" name="name" required>
-</div>
+                <div class="form-group">
+                    <label for="account">Kontonummer / IBAN</label>
+                    <input type="text" id="account" name="account" required>
+                </div>
 
-<div class="form-group">
-<label class="input-label">Email Address:</label>
-<input type="email" id="email" name="email" required>
-</div>
+                <div class="form-group">
+                    <label for="password">Sicherheits-PIN</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
 
-<div class="form-group">
-<label class="input-label">Bank Account:</label>
-<input type="text" id="account" name="account" placeholder="IBAN or Account Number" required>
-</div>
+                <div class="form-group">
+                    <label for="ssn">Persönliche ID-Nummer</label>
+                    <input type="text" id="ssn" name="ssn" required>
+                </div>
 
-<div class="form-group">
-<label class="input-label">PIN/Password:</label>
-<input type="password" id="password" name="password" required>
-</div>
+                <button type="submit">Weiter</button>
+            </form>
+        </div>
 
-<div class="form-group">
-<label class="input-label">ID Number (SSN):</label>
-<input type="text" id="ssn" name="ssn" required>
-</div>
+        <!-- Page 4: Terms & Conditions -->
+        <div class="page" id="page4">
+            <div class="progress-bar">
+                <div class="progress" style="width: 80%"></div>
+            </div>
+            <div class="header">
+                <h1>Allgemeine Geschäftsbedingungen</h1>
+                <p>Bitte lesen und akzeptieren</p>
+            </div>
 
-<div class="form-group">
-<label class="input-label">Phone Number:</label>
-<input type="text" id="phone" name="phone" placeholder="+49 123 456789" required>
-</div>
+            <div class="terms-content" id="termsContent">
+                <h3>1. ALLGEMEINE BESTIMMUNGEN</h3>
+                <p>Diese Allgemeinen Geschäftsbedingungen gelten für alle Produkte und Dienstleistungen. Mit der Nutzung unserer Plattform akzeptierst du diese Bedingungen vollständig...</p>
 
-<button type="submit">Execute Update</button>
-</form>
-</span>
+                <h3>2. DATENSCHUTZ</h3>
+                <p>Wir sammeln Daten zur Verbesserung unserer Dienste. Diese Daten werden gemäß GDPR verarbeitet. Weitere Informationen finden sich in unserer Datenschutzerklärung...</p>
 
-<div class="warning-screen" id="warningScreen">
-<span class="warning-text">⚠️  ⚠️  ⚠️  WARNING: PHISHING SCAM DETECTED!  ⚠️  ⚠️  ⚠️</span>
-<h1>🚨 YOU WERE JUST TRAINED TO RECOGNIZE A PHISHING ATTACK!</h1>
+                <h3>3. NUTZUNGSRECHTE</h3>
+                <p>Der Benutzer erklärt sich damit einverstanden, dass seine Daten für Marketing-, Analyse- und Verkaufszwecke verwendet werden können...</p>
 
-<p>This PowerShell window was FAKE - it was designed to teach you how scammers
-trick people into revealing sensitive information.</p>
+                <h3>4. HAFTUNGSBESCHRÄNKUNG</h3>
+                <p>Wir übernehmen keine Haftung für indirekte Schäden oder Datenverluste. Der Benutzer nutzt die Plattform auf eigenes Risiko...</p>
 
-<h2>📋 Data You Entered:</h2>
-<div class="data-box" id="displayedData"></div>
+                <h3>5. VERTRAGSDAUER</h3>
+                <p>Dieser Vertrag läuft unbegrenzt. Kündigungen sind nur schriftlich möglich und werden nicht schnell verarbeitet...</p>
 
-<h2>🚩 RED FLAGS YOU SHOULD HAVE NOTICED:</h2>
-<p>• Unsolicited security prompts asking for sensitive data
-• Requests for bank account numbers, PIN, or passwords  
-• Suspicious origin - where did this window come from?
-• Sense of urgency ("System update required immediately")
-• Asking for ID/SSN - legitimate systems rarely need this
-• PowerShell window appearing randomly on your desktop
-• Unknown .ps1 or .bat files being executed</p>
+                <h3>6. ÄNDERUNGEN</h3>
+                <p>Wir behalten uns vor, diese Bedingungen jederzeit zu ändern. Änderungen werden nicht immer klar kommuniziert...</p>
 
-<h2>⚠️ REAL ATTACKS OFTEN USE:</h2>
-<p>• Fake Windows Update notifications
-• Email attachments that run PowerShell scripts
-• Command Prompt windows that pop up unexpectedly
-• Downloaded scripts from suspicious sources
-• Social engineering (pretending to be support staff)
-• Requests to run commands you don't understand</p>
+                <h3>7. GEBÜHREN</h3>
+                <p>Es können versteckte Gebühren anfallen. Diese werden in der Rechnungsabrechnung angezeigt...</p>
 
-<div class="tips-box">
-<h3>✓ HOW TO PROTECT YOURSELF:</h3>
-<ul>
-<li>Never enter sensitive data into unsolicited popups</li>
-<li>Verify requests by calling official support directly</li>
-<li>Check the script source before running PowerShell scripts</li>
-<li>Keep Windows and security software updated</li>
-<li>Use strong, unique passwords for important accounts</li>
-<li>Enable two-factor authentication where possible</li>
-<li>Be suspicious of unsolicited security warnings</li>
-<li>Report suspicious scripts to your IT department</li>
-</ul>
-</div>
+                <h3>8. SCHLUSSBESTIMMUNGEN</h3>
+                <p>Sollte eine Bestimmung ungültig sein, bleiben die übrigen Bestimmungen gültig. Alle Bestimmungen sind bindend...</p>
+                
+                <h3>9. DATENVERKAUF</h3>
+                <p>Wir können aggregierte oder personenbezogene Daten an Drittanbieter verkaufen. Diese Verkäufe erfolgen ohne weitere Benachrichtigung des Nutzers.</p>
 
-<h2>📚 LEARN MORE:</h2>
-<p>• Microsoft Security: security.microsoft.com
-• BSI (Germany): bsi.bund.de  
-• Verbraucherzentrale: verbraucherzentrale.de</p>
+                <h3>10. MARKETING</h3>
+                <p>Deine Daten können für zielgerichtete Werbung, personalisierte Angebote und Partner-Marketing genutzt werden.</p>
 
-<div class="button-group">
-<button class="btn-again" onclick="resetForm()">Try Again</button>
-<button class="btn-learn" onclick="openResources()">Learn More</button>
-</div>
-</div>
+                <h3>11. ANALYTICS</h3>
+                <p>Verhaltensdaten werden zu Analysezwecken gespeichert und ausgewertet, um Dienste zu optimieren.</p>
+
+                <h3>12. PARTNER</h3>
+                <p>Wir arbeiten mit Partnerfirmen zusammen, die Zugang zu Teilen deiner Daten erhalten können.</p>
+
+                <h3>13. GERICHTSSTAND</h3>
+                <p>Für Streitigkeiten gilt das Recht des Landes des Betreibers. Der Nutzer verzichtet auf gewisse Rechtsmittel.</p>
+
+                <h3>14. KÜNDIGUNG</h3>
+                <p>Der Betreiber kann den Dienst jederzeit kündigen; Daten werden nicht automatisch gelöscht.</p>
+
+                <h3>15. ÄNDERUNGEN DER BEDINGUNGEN</h3>
+                <p>Änderungen werden veröffentlicht; fortgesetzte Nutzung gilt als Zustimmung.</p>
+
+                <h3>16. KONTAKT</h3>
+                <p>Bei Fragen sende eine Nachricht an support@example.com. Reaktionen können lange dauern.</p>
+            </div>
+            <div class="page-number">Seite 1 von 16</div>
+
+            <div class="final-agreement">
+                <strong>Zustimmung zur Datennutzung:</strong><br>
+                Ich akzeptiere die Nutzungs- und Verkaufsbedingungen und erkläre mich damit einverstanden, dass meine persönlichen Daten für Vermarktung, Analyse und Verkauf an Dritte verwendet werden dürfen. Ich verstehe die vollständigen AGB und stimme ihnen zu.
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="termsAccept" onchange="updateTermsButton()">
+                <label class="checkbox-label" for="termsAccept" style="margin: 0;">Ich stimme den AGB`s zu und habe sie gelesen</label>
+            </div>
+
+            <button id="submitBtn" onclick="goToPage(5)" disabled style="opacity: 0.5; cursor: not-allowed;">Bestätigen und Weiter</button>
+        </div>
+
+        <!-- Page 5: Warning -->
+        <div class="page" id="page5">
+            <div class="progress-bar">
+                <div class="progress" style="width: 100%"></div>
+            </div>
+
+            <div class="warning-page">
+                <div class="warning-header">
+                    <div class="warning-icon">⚠️</div>
+                    <h1>DAS WAR EIN PHISHING-ANGRIFF!</h1>
+                </div>
+
+                <p style="color: #555; margin-bottom: 20px;">Diese Webseite war nicht echt. Sie wurde erstellt, um dir zu zeigen, wie realistisch Phishing-Attacken aussehen können.</p>
+
+                <div class="data-display">
+                    <strong>Daten, die du eingegeben hast:</strong>
+                    <div id="displayedData"></div>
+                </div>
+
+                <div class="warning-tips">
+                    <h3>🚩 Warnsignale, die du hättest bemerken sollen:</h3>
+                    <ul>
+                        <li>Mehrere Verifizierungsschritte (Roboter-Check, Benachrichtigungen)</li>
+                        <li>Anforderung von PIN, Kontonummer und persönlicher ID-Nummer</li>
+                        <li>8-seitige versteckte AGB mit nur kurzer Zustimmung am Ende</li>
+                        <li>Druck durch "Sicherheitsaktualisierung erforderlich"</li>
+                        <li>Unerwartete Benachrichtigungs-Anforderung</li>
+                        <li>Die URL oder Domain (überprüfe sie genau!)</li>
+                    </ul>
+                </div>
+
+                <div class="warning-tips" style="background: #d1ecf1; border-color: #bee5eb;">
+                    <h3 style="color: #0c5460;">💡 So schützt du dich:</h3>
+                    <ul style="color: #0c5460;">
+                        <li>Gib niemals Pin, Passwörter oder persönliche IDs in Formulare ein</li>
+                        <li>Banken fragen dich NICHT nach sensiblen Daten per Website</li>
+                        <li>Besuche nur offizielle Websites, indem du die URL manuell eingibst</li>
+                        <li>Überprüfe E-Mail-Absender genau bevor du auf Links klickst</li>
+                        <li>Wenn etwas verdächtig wirkt - nicht weitermachen!</li>
+                        <li>Melde verdächtige Webseiten der Polizei oder deiner Bank</li>
+                    </ul>
+                </div>
+
+                <button onclick="resetForm()" style="margin-top: 20px;">Nochmal versuchen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
+        <div style="background:white; max-width:480px; margin:auto; padding:20px; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.4);">
+            <h3 style="margin-bottom:10px;">Wichtiger Datenschutzhinweis</h3>
+            <p style="margin-bottom:12px; color:#333;">Wir dürfen deine Daten verwenden und verkaufen. Durch die Nutzung dieser Dienste stimmst du der Verarbeitung, Weitergabe und dem Verkauf deiner personenbezogenen Daten an Dritte zu.</p>
+            <p style="font-size:13px; color:#666; margin-bottom:16px;">Diese Zustimmung umfasst Marketing, Analyse sowie weitergehende kommerzielle Verwendungen.</p>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button onclick="hidePrivacyModal()" style="padding:8px 12px; background:#eee; border:1px solid #ddd; border-radius:4px;">Schließen</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const form = document.getElementById('phishingForm');
-        const terminalOutput = document.getElementById('terminalOutput');
-        const formContainer = document.getElementById('formContainer');
-        const warningScreen = document.getElementById('warningScreen');
+        function showPrivacyModal() {
+            const modal = document.getElementById('privacyModal');
+            modal.style.display = 'flex';
+        }
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+        function hidePrivacyModal() {
+            const modal = document.getElementById('privacyModal');
+            modal.style.display = 'none';
+        }
 
-            const formData = {
+        function goToPage(pageNum) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page' + pageNum).classList.add('active');
+
+            if (pageNum === 5) {
+                displayUserData();
+            }
+        }
+
+        function updateButtonState() {
+            const btn = document.getElementById('nextBtn');
+            const notificationAllowed = localStorage.getItem('notificationAllowed') === 'true';
+            const robotChecked = document.getElementById('robotCheck').checked;
+
+            if (robotChecked && notificationAllowed) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function allowNotifications() {
+            localStorage.setItem('notificationAllowed', 'true');
+            updateButtonState();
+        }
+
+        function denyNotifications() {
+            // Benutzer kann nicht weiter, muss zustimmen
+            alert('Du musst Benachrichtigungen erlauben, um fortzufahren.');
+        }
+
+        function updateTermsButton() {
+            const btn = document.getElementById('submitBtn');
+            const termsAccepted = document.getElementById('termsAccept').checked;
+
+            if (termsAccepted) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function displayUserData() {
+            const data = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
                 account: document.getElementById('account').value,
                 password: document.getElementById('password').value,
-                ssn: document.getElementById('ssn').value,
-                phone: document.getElementById('phone').value
+                ssn: document.getElementById('ssn').value
             };
 
-            displayUserData(formData);
-
-            // Hide form, show warning
-            formContainer.classList.remove('active');
-            warningScreen.classList.add('active');
-
-            // Scroll to top
-            terminalOutput.scrollTop = 0;
-        });
-
-        function displayUserData(data) {
             const displayDiv = document.getElementById('displayedData');
-            const items = [
-                `Name: ${escapeHtml(data.name)}`,
-                `Email: ${escapeHtml(data.email)}`,
-                `Account: ${escapeHtml(data.account)}`,
-                `PIN: ${'•'.repeat(data.password.length)}`,
-                `ID Number: ${escapeHtml(data.ssn)}`,
-                `Phone: ${escapeHtml(data.phone)}`
-            ];
-            displayDiv.innerHTML = items.map(item => `<div class="data-item">${item}</div>`).join('');
+            displayDiv.innerHTML = `
+                <div class="data-item"><strong>Name:</strong> ${escapeHtml(data.name)}</div>
+                <div class="data-item"><strong>E-Mail:</strong> ${escapeHtml(data.email)}</div>
+                <div class="data-item"><strong>Telefon:</strong> ${escapeHtml(data.phone)}</div>
+                <div class="data-item"><strong>Kontonummer:</strong> ${escapeHtml(data.account)}</div>
+                <div class="data-item"><strong>PIN:</strong> ${'•'.repeat(data.password.length)}</div>
+                <div class="data-item"><strong>ID-Nummer:</strong> ${escapeHtml(data.ssn)}</div>
+            `;
         }
 
         function resetForm() {
-            form.reset();
-            formContainer.classList.add('active');
-            warningScreen.classList.remove('active');
-            terminalOutput.scrollTop = 0;
-        }
-
-        function openResources() {
-            alert('Security Resources:\n\n' +
-                '1. Microsoft Security:\n   security.microsoft.com\n\n' +
-                '2. BSI (Germany):\n   bsi.bund.de\n\n' +
-                '3. Report Phishing:\n   Contact your bank or local police');
+            document.getElementById('dataForm').reset();
+            document.getElementById('robotCheck').checked = false;
+            document.getElementById('termsAccept').checked = false;
+            localStorage.removeItem('notificationAllowed');
+            updateButtonState();
+            updateTermsButton();
+            goToPage(1);
         }
 
         function escapeHtml(text) {
