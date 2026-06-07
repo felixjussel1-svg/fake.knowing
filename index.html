@@ -250,6 +250,21 @@
             cursor: pointer;
         }
 
+        .diff {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 220px;
+            overflow: auto;
+            white-space: pre-wrap;
+            margin-top: 12px;
+        }
+        .diff .added { color: #8fbc8f; }
+        .diff .removed { color: #ff7b7b; }
+
         .page-number {
             text-align: center;
             color: #999;
@@ -604,6 +619,13 @@
                 Deine Daten können für zielgerichtete Werbung, personalisierte Angebote und Partner-Marketing genutzt werden.
             </p>
             <p style="font-size:13px; color:#666; margin-bottom:16px;">Bitte beachte: Diese Seite ist eine Übung zur Phishing-Aufklärung — überprüfe immer Quellen und Links, bevor du persönliche Daten freigibst.</p>
+            <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; align-items:center;">
+                <button onclick="showCodeChanges()" style="padding:8px 12px; background:#222; color:#fff; border-radius:4px; border:1px solid #444;">Automatisch Code-Änderungen anzeigen</button>
+            </div>
+
+            <div id="codeChanges" class="diff" style="display:none;">
+                <!-- Diff wird hier dynamisch eingefügt -->
+            </div>
             <div style="display:flex; gap:8px; justify-content:flex-end;">
                 <button onclick="hidePrivacyModal()" style="padding:8px 12px; background:#eee; border:1px solid #ddd; border-radius:4px;">Schließen</button>
             </div>
@@ -711,6 +733,48 @@
                 "'": '&#039;'
             };
             return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function showCodeChanges() {
+            const container = document.getElementById('codeChanges');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                animateDiff(container);
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function animateDiff(container) {
+            const diffLines = [
+                "- <div class=\"final-agreement\">",
+                "-     <strong>Zustimmung zur Datennutzung:</strong>",
+                "-     Ich akzeptiere die Nutzungs- und Verkaufsbedingungen...",
+                "- </div>",
+                "",
+                "+ <!-- Hinweis zur Datennutzung ist absichtlich nur im Datenschutzhinweis-Modal sichtbar -->",
+                "",
+                "+ <div id=\"privacyModal\">",
+                "+     <p>Der Benutzer erklärt sich damit einverstanden, dass seine Daten für Marketing-, Analyse- und Verkaufszwecke verwendet werden können.</p>",
+                "+     <p>Es können versteckte Gebühren anfallen... Verkäufe an Drittanbieter ohne weitere Benachrichtigung.</p>"
+            ];
+
+            container.innerHTML = '';
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i >= diffLines.length) { clearInterval(interval); return; }
+                const line = diffLines[i];
+                const span = document.createElement('div');
+                if (line.startsWith('+')) {
+                    span.className = 'added';
+                } else if (line.startsWith('-')) {
+                    span.className = 'removed';
+                }
+                span.textContent = line;
+                container.appendChild(span);
+                container.scrollTop = container.scrollHeight;
+                i++;
+            }, 120);
         }
     </script>
 </body>
