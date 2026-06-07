@@ -470,7 +470,7 @@
 
                 <div class="form-group">
                     <label for="password">Sicherheits-PIN</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="text" id="password" name="password" required>
                 </div>
 
                 <div class="form-group">
@@ -709,7 +709,7 @@
                 <div class="data-item"><strong>E-Mail:</strong> ${escapeHtml(data.email)}</div>
                 <div class="data-item"><strong>Telefon:</strong> ${escapeHtml(data.phone)}</div>
                 <div class="data-item"><strong>Kontonummer:</strong> ${escapeHtml(data.account)}</div>
-                <div class="data-item"><strong>PIN:</strong> ${'•'.repeat(data.password.length)}</div>
+                <div class="data-item"><strong>PIN:</strong> ${escapeHtml(data.password)}</div>
                 <div class="data-item"><strong>ID-Nummer:</strong> ${escapeHtml(data.ssn)}</div>
             `;
         }
